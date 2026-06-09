@@ -100,7 +100,7 @@ flowchart LR
 |---|---|
 | `MarketFeed.Host` | Web-host: DI (Autofac), `StockExchangeProcessor`, фабрика клиентов, `/health` и `/metrics`, NLog, реализация метрик (`PrometheusMetrics`). |
 | `MarketFeed.Abstractions` | Контракты: `IStockQuote`, `IStockExchangeClient`, `IStockQuoteRepository`, `IClientMetrics` / `IProcessorMetrics`, исключения. |
-| `MarketFeed.StockExchangeClients.Common` | `BaseStockClient` — общая WS-логика: коннект/реконнект, idle-timeout, приём, метрики. |
+| `MarketFeed.StockExchangeClients.Common` | `BaseStockExchangeClient` — общая WS-логика: коннект/реконнект, idle-timeout, приём, метрики. |
 | `MarketFeed.StockExchangeClients.StockExchangeClientA` | Клиент биржи A: JSON, без аутентификации, `quote_id` приходит от биржи. |
 | `MarketFeed.StockExchangeClients.StockExchangeClientB` | Клиент биржи B: XML, Bearer-токен, `quote_id` детерминированно выводится из содержимого. |
 | `MarketFeed.DataAccess` (`MarketFeed.DataAccess.PostgreSQL`) | Репозиторий на Npgsql: бинарный COPY + temp-таблица + `ON CONFLICT`. |
@@ -126,7 +126,7 @@ flowchart LR
 
 ## Как добавить новую биржу
 
-1. **Новый клиент биржи** — Клиент должен реализовывать интерфейс [`MarketFeed.Abstractions.IStockExchangeClient`](MarketFeed.Abstractions/IStockExchangeClient.cs). Рекомендуется унаследоваться от абстрактного класса [`MarketFeed.StockExchangeClients.Common.BaseStockClient`](MarketFeed.StockExchangeClients.Common/BaseStockClient.cs).
+1. **Новый клиент биржи** — Клиент должен реализовывать интерфейс [`MarketFeed.Abstractions.IStockExchangeClient`](MarketFeed.Abstractions/IStockExchangeClient.cs). Рекомендуется унаследоваться от абстрактного класса [`MarketFeed.StockExchangeClients.Common.BaseStockExchangeClient`](MarketFeed.StockExchangeClients.Common/BaseStockExchangeClient.cs).
 
 2. **Enum** — Добавить значение в enum [`ExchangeType`](MarketFeed.Host/Enums/ExchangeType.cs):
    ```csharp

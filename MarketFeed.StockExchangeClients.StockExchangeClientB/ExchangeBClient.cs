@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace MarketFeed.StockExchangeClients.StockExchangeClientB;
 
-public sealed class ExchangeBClient : BaseStockClient
+public sealed class ExchangeBClient : BaseStockExchangeClient
 {
     private static readonly XmlSerializer Serializer = new(typeof(ExchangeBStockQuote));
 

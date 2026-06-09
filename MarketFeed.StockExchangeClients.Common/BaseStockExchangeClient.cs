@@ -11,7 +11,7 @@ using System.Threading.Channels;
 
 namespace MarketFeed.StockExchangeClients.Common;
 
-public abstract class BaseStockClient : IStockExchangeClient
+public abstract class BaseStockExchangeClient : IStockExchangeClient
 {
     private const int BufferSizeBytes = 8 * 1024; // 8 kbytes
     private const int MaxMessageSizeBytes = 1 * 1024 * 1024; // 1 megabyte
@@ -35,7 +35,7 @@ public abstract class BaseStockClient : IStockExchangeClient
 
     protected ILogger Logger => _logger;
 
-    protected BaseStockClient(BaseStockExchangeClientConfiguration configuration, ILogger logger, IClientMetrics metrics)
+    protected BaseStockExchangeClient(BaseStockExchangeClientConfiguration configuration, ILogger logger, IClientMetrics metrics)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(logger);

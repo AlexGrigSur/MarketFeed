@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace MarketFeed.StockExchangeClients.StockExchangeClientA;
 
-public sealed class ExchangeAClient : BaseStockClient
+public sealed class ExchangeAClient : BaseStockExchangeClient
 {
     private readonly string[] _tickers;
 
