@@ -47,8 +47,13 @@
     },
     "rules": [
       {
+        "logger": "Microsoft.AspNetCore.*",
+        "finalMinLevel": "Warning",
+        "writeTo": "logFile, logConsole"
+      },
+      {
         "logger": "*",
-        "minLevel": "Debug",
+        "minLevel": "Information",
         "writeTo": "logFile, logConsole"
       }
     ]
