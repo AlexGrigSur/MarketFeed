@@ -1,5 +1,4 @@
 <Solution>
-  <Folder Name="/MarketFeed.DataAccess/" />
   <Folder Name="/MockStockExchanges/">
     <Project Path="MarketFeed.MockStockExchanges.ExchangeA/MarketFeed.MockStockExchanges.ExchangeA.csproj" Id="404b9b87-de1d-4cdc-b58a-8ce2cdf9e660" />
     <Project Path="MarketFeed.MockStockExchanges.ExchangeB/MarketFeed.MockStockExchanges.ExchangeB.csproj" Id="a22f29c3-36b4-433e-a47b-dbd796c69e46" />
