@@ -1,0 +1,56 @@
+{
+  "NLog": {
+    "internalLogLevel": "Error",
+    "internalLogToConsole": true,
+    "internalLogFile": "nlog-internal.log",
+    "extensions": [
+      {
+        "assembly": "NLog.Web.AspNetCore"
+      }
+    ],
+    "default-wrapper": {
+      "type": "AsyncWrapper",
+      "overflowAction": "Block"
+    },
+    "variables": {
+      "fileHeader": "------------============== ${longdate} ==============------------",
+      "defaultLayout": "${time}|${level:uppercase=true}|${logger}|${callsite:className=false}|${message} ${exception:format=tostring}",
+      "fileFooter": "------------============== ${longdate} ==============------------",
+      "logsFolder": "logs"
+    },
+    "targets": {
+      "logFile": {
+        "type": "File",
+        "fileName": "${logsFolder}/MarketFeed.log",
+        "header": "${fileHeader}",
+        "layout": "${defaultLayout}",
+        "footer": "${fileFooter}",
+
+        "encoding": "UTF-8",
+        "autoflush": true,
+        "keepFileOpen": true,
+        "createDirs": true,
+
+        "archiveEvery": "Day",
+        "archiveFileName": "${logsFolder}/archive/MarketFeed-{#}.zip",
+        "archiveNumbering": "Date",
+        "archiveDateFormat": "yyyy-MM-dd",
+        "maxArchiveFiles": 60,
+        "enableArchiveFileCompression": true
+      },
+      "logConsole": {
+        "type": "ColoredConsole",
+        "autoFlush": true,
+        "detectConsoleAvailable": true,
+        "layout": "${defaultLayout}"
+      }
+    },
+    "rules": [
+      {
+        "logger": "*",
+        "minLevel": "Debug",
+        "writeTo": "logFile, logConsole"
+      }
+    ]
+  }
+}

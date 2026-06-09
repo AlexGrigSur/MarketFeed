@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: market_feed
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./MarketFeed.Database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d market_feed"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  exchange-a:
+    build:
+      context: .
+      dockerfile: MarketFeed.MockStockExchanges.ExchangeA/Dockerfile
+    environment:
+      ServerAddress: "http://0.0.0.0:5008"
+      QuotesPerSecond: "100"
+      DuplicatePercent: "5"
+      DropConnectionMinSeconds: "30"
+      DropConnectionMaxSeconds: "60"
+    ports:
+      - "5008:5008"
+
+  exchange-b:
+    build:
+      context: .
+      dockerfile: MarketFeed.MockStockExchanges.ExchangeB/Dockerfile
+    environment:
+      ServerAddress: "http://0.0.0.0:5073"
+      QuotesPerSecond: "1000"
+      AuthToken: "secret-token"
+      DuplicatePercent: "5"
+      DropConnectionMinSeconds: "30"
+      DropConnectionMaxSeconds: "60"
+    ports:
+      - "5073:5073"
+
+  marketfeed:
+    build:
+      context: .
+      dockerfile: MarketFeed.Host/Dockerfile
+    environment:
+      StockExchangeProcessor__ChannelMaxSize: 100000
+      StockExchangeProcessor__BatchSize: 10000
+      StockExchangeProcessor__FlushInterval: "00:01:00"
+      ConnectionStrings__StockQuoteRepository: "Host=postgres;Port=5432;Database=market_feed;Username=postgres;Password=postgres"
+      Exchanges__0__Endpoint: "ws://exchange-a:5008/ws"
+      Exchanges__1__Endpoint: "ws://exchange-a:5008/ws"
+      Exchanges__2__Endpoint: "ws://exchange-b:5073/ws"
+      Exchanges__2__AuthToken: "secret-token"
+    ports:
+      - "8080:8080"
+      - "9100:9100"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      exchange-a:
+        condition: service_started
+      exchange-b:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      marketfeed:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/MarketFeed.json
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:

@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/MarketFeed.DataAccess/" />
+  <Folder Name="/MockStockExchanges/">
+    <Project Path="MarketFeed.MockStockExchanges.ExchangeA/MarketFeed.MockStockExchanges.ExchangeA.csproj" Id="404b9b87-de1d-4cdc-b58a-8ce2cdf9e660" />
+    <Project Path="MarketFeed.MockStockExchanges.ExchangeB/MarketFeed.MockStockExchanges.ExchangeB.csproj" Id="a22f29c3-36b4-433e-a47b-dbd796c69e46" />
+  </Folder>
+  <Folder Name="/StockExchangeClients/">
+    <Project Path="MarketFeed.StockExchangeClients.Common/MarketFeed.StockExchangeClients.Common.csproj" Id="10c449fb-3abe-4460-92bd-598f5ce6d6d8" />
+    <Project Path="MarketFeed.StockExchangeClients.StockExchangeClientA/MarketFeed.StockExchangeClients.StockExchangeClientA.csproj" Id="0dd0a87b-5ad3-45a3-af95-a524a09fdc5c" />
+    <Project Path="MarketFeed.StockExchangeClients.StockExchangeClientB/MarketFeed.StockExchangeClients.StockExchangeClientB.csproj" Id="a053604e-0f5a-4848-9cbe-66ea56d1fd68" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="MarketFeed.DataAccess.Tests/MarketFeed.DataAccess.Tests.csproj" />
+  </Folder>
+  <Project Path="MarketFeed.Abstractions/MarketFeed.Abstractions.csproj" />
+  <Project Path="MarketFeed.DataAccess/MarketFeed.DataAccess.PostgreSQL.csproj" Id="654961f9-ab4d-4b1c-bc89-647ad8e5b7ae" />
+  <Project Path="MarketFeed.Database/MarketFeed.Database.csproj" Id="e8b17214-b391-4d4c-94ce-a1f3d9cdec72" />
+  <Project Path="MarketFeed.Host/MarketFeed.Host.csproj" />
+</Solution>
