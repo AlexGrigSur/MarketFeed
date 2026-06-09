@@ -124,6 +124,30 @@ flowchart LR
 
 ---
 
+## Как добавить новую биржу
+
+1. **Новый клиент биржи** — Клиент должен реализовывать интерфейс [`MarketFeed.Abstractions.IStockExchangeClient`](MarketFeed.Abstractions/IStockExchangeClient.cs). Рекомендуется унаследоваться от абстрактного класса [`MarketFeed.StockExchangeClients.Common.BaseStockClient`](MarketFeed.StockExchangeClients.Common/BaseStockClient.cs).
+
+2. **Enum** — Добавить значение в enum [`ExchangeType`](MarketFeed.Host/Enums/ExchangeType.cs):
+   ```csharp
+   public enum ExchangeType : byte { Undefined = 0, ExchangeA = 1, ExchangeB = 2, /*NEW*/ ExchangeC = 3 }
+   ```
+
+3. **Фабрика** [`StockExchangeClientFactory`](MarketFeed.Host/StockExchangeClientFactory.cs) — ветка в `CreateClient` + добавить необходимые опциональные настройки в класс [`StockClientConfiguration`](MarketFeed.Host/Settings/StockClientConfiguration.cs) и маппинг опций в настройки нового клиента (e.g. `ToOptionsC`):
+   ```csharp
+   ExchangeType.ExchangeC => new ExchangeCClient(
+       ToOptionsC(configuration), _loggerFactory.CreateLogger<ExchangeCClient>(), _metrics),
+   ```
+
+4. **Конфиг** — добавить запись в массив `Exchanges` ([appsettings.json](MarketFeed.Host/appsettings.json)) и, для Docker, оверрайд эндпоинта в [`docker-compose.yml`](docker-compose.yml):
+   ```json
+   { "ExchangeType": "ExchangeC", "InstanceName": "ExchangeC", "Endpoint": "ws://localhost:5099/ws", "Tickers": [] }
+   ```
+
+> Можно добавлять несколько инстансов одной биржи — просто несколько записей в `Exchanges` с разными `InstanceName` (например, отдельный поток только по `AAPL`).
+
+---
+
 ## Устойчивость
 
 - **Авто-реконнект**: при обрыве соединения клиент переподключается (Polly с экспоненциальным backoff с джиттером). Подписка переотправляется на каждом коннекте.
