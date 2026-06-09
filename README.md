@@ -25,7 +25,7 @@
 
 - **Идентичность котировки vs инстанса клиента.** В котировке `exchange` = **тип биржи**
   (константа, напр. `"ExchangeA"`) — поэтому дедуп работает между инстансами одной биржи.
-  У клиента отдельно есть `InstanceName` (напр. `"ExchangeA-USD"`) — он используется только
+  У клиента отдельно есть `InstanceName` (напр. `"ExchangeA-AAPL"`) — он используется только
   в логах и метриках, чтобы различать несколько инстансов одной биржи.
 
 ---
@@ -88,7 +88,7 @@ flowchart LR
 **Поток данных:**
 1. Клиенты бирж (`ExchangeAClient`, `ExchangeBClient`) держат WebSocket-соединение, парсят входящие сообщения и нормализуют их в `IStockQuote`.
 2. Нормализованные котировки пишутся в ограниченный `Channel<IStockQuote>` (backpressure при переполнении).
-3. `StockExchangeProcessor` (фоновый `BackgroundService`) вычитывает канал, копит батч и сохраняет его, когда набралось `BatchSize` либо прошёл `FlushInterval`.
+3. `StockExchangeProcessor` (фоновый `BackgroundService`) вычитывает канал, копит батч и сохраняет его, когда набралось `BatchSize` либо прошёл `SaveInterval`.
 4. Репозиторий грузит батч бинарным `COPY` во временную таблицу и делает `INSERT … ON CONFLICT DO NOTHING` — так дубликаты отсекаются и возвращается число реально вставленных строк.
 5. По ходу работы пишутся метрики; Prometheus их скрейпит, Grafana визуализирует.
 
@@ -150,7 +150,7 @@ flowchart LR
 | `batch_save_duration_seconds` | histogram | время сохранения батча |
 | `batch_size` | histogram | размер флашнутого батча |
 
-Label `exchange` несёт **`InstanceName`** клиента — поэтому несколько инстансов одной биржи (напр. `ExchangeA` и `ExchangeA-USD`) видны в метриках раздельно.
+Label `exchange` несёт **`InstanceName`** клиента — поэтому несколько инстансов одной биржи (напр. `ExchangeA` и `ExchangeA-AAPL`) видны в метриках раздельно.
 
 **Дашборд Grafana** провижинится автоматически (датасорс + дашборд монтируются в контейнер) — после `docker compose up` он сразу доступен и является стартовой страницей, без логина и ручного импорта.
 
@@ -183,16 +183,21 @@ docker compose up --build
 
 ```jsonc
 "StockExchangeProcessor": {
-  "ChannelMaxSize": 10000,    // ёмкость канала (backpressure)
-  "BatchSize": 1000,          // флаш по достижении размера
-  "FlushInterval": "00:01:00" // либо по таймеру
+  "ChannelMaxSize": 10000,     // ёмкость канала (backpressure)
+  "BatchSize": 1000,           // сохранение по достижении размера
+  "SaveInterval": "00:01:00",  // либо по таймеру
+  "SaveRetry": {               // ретрай записи батча (Polly, только транзиентные ошибки БД)
+    "MaxRetryAttempts": 3,
+    "Delay": "00:00:00.200",
+    "MaxDelay": "00:00:05"
+  }
 },
 "Metrics": { "Port": 9100 },  // порт эндпоинта /metrics
 
 // Список клиентов: каждая запись — отдельный инстанс. Можно несколько на одну биржу.
 "Exchanges": [
   { "ExchangeType": "ExchangeA", "InstanceName": "ExchangeA",     "Endpoint": "ws://localhost:5008/ws", "Tickers": [] },
-  { "ExchangeType": "ExchangeA", "InstanceName": "ExchangeA-USD", "Endpoint": "ws://localhost:5008/ws", "Tickers": ["USD"] },
+  { "ExchangeType": "ExchangeA", "InstanceName": "ExchangeA-AAPL", "Endpoint": "ws://localhost:5008/ws", "Tickers": ["AAPL"] },
   { "ExchangeType": "ExchangeB", "InstanceName": "ExchangeB",     "Endpoint": "ws://localhost:5073/ws", "AuthToken": "secret-token", "Tickers": [] }
 ]
 ```
@@ -200,7 +205,8 @@ docker compose up --build
 - `ExchangeType` — дискриминатор (какой клиент создаётся)
 - `InstanceName` — имя инстанса для логов/метрик
 - `Tickers: []` — подписка на все тикеры.
-- `ReconnectDelay`, `MaxReconnectDelay`, `MaxRetryAttempts`, `IdleTimeout` - параметры устойчивости.
+- `ReconnectDelay`, `MaxReconnectDelay`, `MaxRetryAttempts`, `IdleTimeout` - параметры устойчивости клиента.
+- `StockExchangeProcessor.SaveRetry` (`MaxRetryAttempts`/`Delay`/`MaxDelay`) - ретраи записи батча в БД.
 - `ConnectionStrings:StockQuoteRepository` - Строка подключения к бд. 
 …
 

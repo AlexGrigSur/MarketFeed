@@ -50,9 +50,9 @@ services:
       context: .
       dockerfile: MarketFeed.Host/Dockerfile
     environment:
-      StockExchangeProcessor__ChannelMaxSize: 100000
-      StockExchangeProcessor__BatchSize: 10000
-      StockExchangeProcessor__FlushInterval: "00:01:00"
+      StockExchangeProcessor__ChannelMaxSize: 10000
+      StockExchangeProcessor__BatchSize: 1000
+      StockExchangeProcessor__SaveInterval: "00:01:00"
       ConnectionStrings__StockQuoteRepository: "Host=postgres;Port=5432;Database=market_feed;Username=postgres;Password=postgres"
       Exchanges__0__Endpoint: "ws://exchange-a:5008/ws"
       Exchanges__1__Endpoint: "ws://exchange-a:5008/ws"

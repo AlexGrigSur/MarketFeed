@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="MarketFeed.DataAccess.Tests/MarketFeed.DataAccess.Tests.csproj" />
+    <Project Path="MarketFeed.UnitTests/MarketFeed.UnitTests.csproj" />
   </Folder>
   <Project Path="MarketFeed.Abstractions/MarketFeed.Abstractions.csproj" />
   <Project Path="MarketFeed.DataAccess/MarketFeed.DataAccess.PostgreSQL.csproj" Id="654961f9-ab4d-4b1c-bc89-647ad8e5b7ae" />

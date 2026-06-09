@@ -13,7 +13,12 @@ public sealed class StockExchangeProcessorConfiguration
     public int BatchSize { get; set; } = 1000;
 
     /// <summary>
-    /// How often an under-full batch is flushed
+    /// How often an under-full batch is saved
     /// </summary>
-    public TimeSpan FlushInterval { get; set; } = TimeSpan.FromMinutes(1);
+    public TimeSpan SaveInterval { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// <summary>
+    /// Retry policy for persisting a batch (only transient storage failures are retried)
+    /// </summary>
+    public SaveRetryConfiguration SaveRetry { get; set; } = new();
 }

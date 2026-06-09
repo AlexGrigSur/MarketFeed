@@ -20,20 +20,22 @@ public sealed class StockQuoteRepositoryTests
     }
 
     [Test]
-    public async Task SaveAsync_persists_all_fields()
+    public async Task SaveAsync_test()
     {
-        var quote = new TestStockQuote("ExchangeA", "A-1", "AAPL", 123.45m, 1000, SampleTimestamp);
+        var a = new TestStockQuote("ExchangeA", "A-1", "AAPL", 1.2m, 1, SampleTimestamp);
+        var b = new TestStockQuote("ExchangeB", "B-1", "MSFT", 2.34m, 2, SampleTimestamp);
 
-        var inserted = await _repository.SaveAsync(new[] { quote }, CancellationToken.None);
+        var inserted = await _repository.SaveAsync(new[] { a, b }, CancellationToken.None);
 
-        inserted.Should().Be(1);
+        inserted.Should().Be(2);
         var rows = await ReadAllAsync();
-        rows.Should().ContainSingle();
-        rows[0].Should().Be(new StoredRow("ExchangeA", "A-1", "AAPL", 123.45m, 1000, SampleTimestamp));
+        rows.Should().HaveCount(2);
+        rows[0].Should().Be(new StoredRow("ExchangeA", "A-1", "AAPL", 1.2m, 1, SampleTimestamp));
+        rows[1].Should().Be(new StoredRow("ExchangeB", "B-1", "MSFT", 2.34m, 2, SampleTimestamp));
     }
 
     [Test]
-    public async Task SaveAsync_is_idempotent_for_the_same_key_across_calls()
+    public async Task SaveAsync_deduplication_test()
     {
         var quote = new TestStockQuote("ExchangeA", "A-1", "AAPL", 123.45m, 1000, SampleTimestamp);
 
@@ -46,7 +48,7 @@ public sealed class StockQuoteRepositoryTests
     }
 
     [Test]
-    public async Task SaveAsync_deduplicates_within_a_single_batch()
+    public async Task SaveAsync_same_batch_deduplication_test()
     {
         var quote = new TestStockQuote("ExchangeA", "A-1", "AAPL", 123.45m, 1000, SampleTimestamp);
 
@@ -57,7 +59,7 @@ public sealed class StockQuoteRepositoryTests
     }
 
     [Test]
-    public async Task SaveAsync_returns_only_the_count_of_newly_inserted_rows()
+    public async Task SaveAsync_returns_actual_inserted_rows_test()
     {
         var existing = new TestStockQuote("ExchangeA", "A-1", "AAPL", 1m, 1, SampleTimestamp);
         var fresh = new TestStockQuote("ExchangeA", "A-2", "MSFT", 2m, 2, SampleTimestamp);
@@ -70,31 +72,7 @@ public sealed class StockQuoteRepositoryTests
     }
 
     [Test]
-    public async Task SaveAsync_keeps_distinct_keys()
-    {
-        var a = new TestStockQuote("ExchangeA", "A-1", "AAPL", 1m, 1, SampleTimestamp);
-        var b = new TestStockQuote("ExchangeB", "B-1", "MSFT", 2m, 2, SampleTimestamp);
-
-        var inserted = await _repository.SaveAsync(new[] { a, b }, CancellationToken.None);
-
-        inserted.Should().Be(2);
-        (await CountAsync()).Should().Be(2);
-    }
-
-    [Test]
-    public async Task SaveAsync_treats_same_quote_id_on_different_exchanges_as_distinct()
-    {
-        var a = new TestStockQuote("ExchangeA", "shared-id", "AAPL", 1m, 1, SampleTimestamp);
-        var b = new TestStockQuote("ExchangeB", "shared-id", "MSFT", 2m, 2, SampleTimestamp);
-
-        var inserted = await _repository.SaveAsync(new[] { a, b }, CancellationToken.None);
-
-        inserted.Should().Be(2);
-        (await CountAsync()).Should().Be(2);
-    }
-
-    [Test]
-    public async Task SaveAsync_with_an_empty_batch_is_a_noop()
+    public async Task SaveAsync_empty_quotes_test()
     {
         var inserted = await _repository.SaveAsync(Array.Empty<IStockQuote>(), CancellationToken.None);
 

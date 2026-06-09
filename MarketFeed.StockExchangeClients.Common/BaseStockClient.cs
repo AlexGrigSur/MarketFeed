@@ -227,7 +227,7 @@ public abstract class BaseStockClient : IStockExchangeClient
                 return;
             }
 
-            ArrayPoolBufferWriter<byte>? assembled = null;
+            ArrayPoolBufferWriter<byte>? bufferWriter = null;
             try
             {
                 ReadOnlyMemory<byte> message;
@@ -235,11 +235,11 @@ public abstract class BaseStockClient : IStockExchangeClient
                 {
                     message = _buffer.AsMemory(0, result.Count);
                 }
-                else // multi-frame message, needs assembly
+                else // multi-frame message, needs assembly via buffer writer
                 {
-                    assembled = new ArrayPoolBufferWriter<byte>(_buffer.Length * 2);
-                    await ReadFragmentedAsync(ws, result, assembled, linked.Token);
-                    message = assembled.WrittenMemory;
+                    bufferWriter = new ArrayPoolBufferWriter<byte>(_buffer.Length * 2);
+                    await ReadFragmentedAsync(ws, result, bufferWriter, linked.Token);
+                    message = bufferWriter.WrittenMemory;
                 }
 
                 if (TryParse(message.Span, out var quote))
@@ -255,7 +255,7 @@ public abstract class BaseStockClient : IStockExchangeClient
             }
             finally
             {
-                assembled?.Dispose();
+                bufferWriter?.Dispose();
             }
         }
     }

@@ -16,7 +16,7 @@ public class StockExchangeProcessor : BackgroundService
     private readonly ILogger<StockExchangeProcessor> _logger;
 
     private readonly int _batchSize;
-    private readonly TimeSpan _flushInterval;
+    private readonly TimeSpan _saveInterval;
 
     private readonly Channel<IStockQuote> _quoteChannel;
     private readonly ResiliencePipeline _savePipeline;
@@ -45,7 +45,7 @@ public class StockExchangeProcessor : BackgroundService
         _logger = logger;
 
         _batchSize = options.BatchSize;
-        _flushInterval = options.FlushInterval;
+        _saveInterval = options.SaveInterval;
 
         _quoteChannel = Channel.CreateBounded<IStockQuote>(options.ChannelMaxSize);
 
@@ -54,11 +54,11 @@ public class StockExchangeProcessor : BackgroundService
             {
                 ShouldHandle = new PredicateBuilder()
                     .Handle<TransientStorageException>(),
-                MaxRetryAttempts = 3,
+                MaxRetryAttempts = options.SaveRetry.MaxRetryAttempts,
                 BackoffType = DelayBackoffType.Exponential,
                 UseJitter = true,
-                Delay = TimeSpan.FromMilliseconds(200),
-                MaxDelay = TimeSpan.FromSeconds(5),
+                Delay = options.SaveRetry.Delay,
+                MaxDelay = options.SaveRetry.MaxDelay,
                 OnRetry = args =>
                 {
                     _logger.LogWarning(args.Outcome.Exception,
@@ -112,7 +112,7 @@ public class StockExchangeProcessor : BackgroundService
         var buffer = new IStockQuote[_batchSize];
         var count = 0;
 
-        var delayTask = Task.Delay(_flushInterval, cancellationToken);
+        var delayTask = Task.Delay(_saveInterval, cancellationToken);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -137,7 +137,7 @@ public class StockExchangeProcessor : BackgroundService
                         count = 0;
                     }
 
-                    delayTask = Task.Delay(_flushInterval, cancellationToken);
+                    delayTask = Task.Delay(_saveInterval, cancellationToken);
                     continue;
                 }
             }
