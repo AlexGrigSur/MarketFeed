@@ -2,7 +2,7 @@ using MarketFeed.Abstractions;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace MarketFeed.DataAccess.PostgreSQL;
+namespace MarketFeed.DataAccess;
 
 public class StockQuoteRepository : BaseDataMapper, IStockQuoteRepository
 {

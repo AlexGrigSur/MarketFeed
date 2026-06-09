@@ -1,6 +1,6 @@
 using Autofac;
 using MarketFeed.Abstractions;
-using MarketFeed.DataAccess.PostgreSQL;
+using MarketFeed.DataAccess;
 using MarketFeed.Host.Settings;
 using NLog.Extensions.Logging;
 

@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MarketFeed.DataAccess\MarketFeed.DataAccess.PostgreSQL.csproj" />
+    <None Include="..\MarketFeed.Database\init.sql" Link="init.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\MarketFeed.Database\init.sql" Link="init.sql" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\MarketFeed.DataAccess\MarketFeed.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

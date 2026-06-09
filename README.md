@@ -103,7 +103,7 @@ flowchart LR
 | `MarketFeed.StockExchangeClients.Common` | `BaseStockExchangeClient` — общая WS-логика: коннект/реконнект, idle-timeout, приём, метрики. |
 | `MarketFeed.StockExchangeClients.StockExchangeClientA` | Клиент биржи A: JSON, без аутентификации, `quote_id` приходит от биржи. |
 | `MarketFeed.StockExchangeClients.StockExchangeClientB` | Клиент биржи B: XML, Bearer-токен, `quote_id` детерминированно выводится из содержимого. |
-| `MarketFeed.DataAccess` (`MarketFeed.DataAccess.PostgreSQL`) | Репозиторий на Npgsql: бинарный COPY + temp-таблица + `ON CONFLICT`. |
+| `MarketFeed.DataAccess` | Репозиторий на Npgsql: бинарный COPY + temp-таблица + `ON CONFLICT`. |
 | `MarketFeed.Database` | `init.sql` — схема БД (накатывается контейнером Postgres при первом старте). |
 | `MarketFeed.MockStockExchanges.ExchangeA` | Мок-биржа A (JSON, без auth). |
 | `MarketFeed.MockStockExchanges.ExchangeB` | Мок-биржа B (XML, Bearer). |

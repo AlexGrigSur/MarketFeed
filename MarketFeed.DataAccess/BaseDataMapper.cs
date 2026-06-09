@@ -3,7 +3,7 @@ using NpgsqlTypes;
 using System.Data;
 using System.Runtime.CompilerServices;
 
-namespace MarketFeed.DataAccess.PostgreSQL;
+namespace MarketFeed.DataAccess;
 
 public abstract class BaseDataMapper
 {

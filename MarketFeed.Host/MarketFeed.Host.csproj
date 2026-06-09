@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MarketFeed.Abstractions\MarketFeed.Abstractions.csproj" />
-    <ProjectReference Include="..\MarketFeed.DataAccess\MarketFeed.DataAccess.PostgreSQL.csproj" />
+    <ProjectReference Include="..\MarketFeed.DataAccess\MarketFeed.DataAccess.csproj" />
     <ProjectReference Include="..\MarketFeed.StockExchangeClients.StockExchangeClientA\MarketFeed.StockExchangeClients.StockExchangeClientA.csproj" />
     <ProjectReference Include="..\MarketFeed.StockExchangeClients.StockExchangeClientB\MarketFeed.StockExchangeClients.StockExchangeClientB.csproj" />
   </ItemGroup>

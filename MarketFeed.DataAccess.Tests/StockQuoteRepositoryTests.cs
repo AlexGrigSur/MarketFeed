@@ -1,6 +1,6 @@
 using FluentAssertions;
 using MarketFeed.Abstractions;
-using MarketFeed.DataAccess.PostgreSQL;
+using MarketFeed.DataAccess;
 using Npgsql;
 
 namespace MarketFeed.DataAccess.Tests;
