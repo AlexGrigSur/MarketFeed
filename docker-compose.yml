@@ -1,3 +1,5 @@
+name: marketfeed
+
 services:
   postgres:
     image: postgres:16
@@ -43,7 +45,7 @@ services:
     ports:
       - "5073:5073"
 
-  marketfeed:
+  host:
     build:
       context: .
       dockerfile: MarketFeed.Host/Dockerfile
@@ -80,7 +82,7 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      marketfeed:
+      host:
         condition: service_healthy
 
   grafana:
