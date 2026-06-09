@@ -3,8 +3,7 @@ using System.Net;
 namespace MarketFeed.StockExchangeClients.Common;
 
 /// <summary>
-/// A WebSocket handshake rejected with a permanent client error (e.g. 401/403/400).
-/// Retrying the connection will not help, so the client should give up.
+/// A WebSocket handshake rejected with a permanent client error (e.g. 401/403/400)
 /// </summary>
 public sealed class PermanentConnectionException : Exception
 {

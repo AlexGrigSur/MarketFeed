@@ -61,8 +61,6 @@ static async Task StreamQuotesAsync(WebSocket socket, string[] requestedTickers,
         ? requestedTickers
         : ["AAPL", "MSFT", "GOOG", "AMZN", "TSLA"];
 
-    // Per-message Task.Delay can't pace high rates: 1/QuotesPerSecond seconds truncates to 0 ms
-    // once the rate exceeds 1000, removing the throttle entirely. Instead send a burst per fixed tick.
     const int ticksPerSecond = 100;
     var tick = TimeSpan.FromSeconds(1.0 / ticksPerSecond);
     var perTick = Math.Max(1, options.QuotesPerSecond / ticksPerSecond);
@@ -76,7 +74,7 @@ static async Task StreamQuotesAsync(WebSocket socket, string[] requestedTickers,
         {
             if (dropAt is { } deadline && DateTime.UtcNow >= deadline)
             {
-                socket.Abort(); // simulate a connection break; the client reconnects
+                socket.Abort();
                 return;
             }
 
@@ -85,7 +83,7 @@ static async Task StreamQuotesAsync(WebSocket socket, string[] requestedTickers,
                 byte[] payload;
                 if (lastPayload is not null && Random.Shared.Next(100) < options.DuplicatePercent)
                 {
-                    payload = lastPayload; // resend the exact same quote to exercise dedup
+                    payload = lastPayload;
                 }
                 else
                 {
