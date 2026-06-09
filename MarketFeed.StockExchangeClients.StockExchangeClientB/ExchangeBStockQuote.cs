@@ -8,12 +8,12 @@ namespace MarketFeed.StockExchangeClients.StockExchangeClientB;
 [XmlRoot("tick")]
 public sealed class ExchangeBStockQuote : IStockQuote
 {
-    private const string Exchnage = "ExchangeB";
+    private const string Exchange = "ExchangeB";
 
     private string? _quoteId;
 
     [XmlIgnore]
-    public string ExchangeName => Exchnage;
+    public string ExchangeName => Exchange;
 
     [XmlElement("symbol")]
     public string Ticker { get; set; } = string.Empty;
