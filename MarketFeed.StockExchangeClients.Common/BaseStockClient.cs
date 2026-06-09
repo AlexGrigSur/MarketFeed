@@ -33,6 +33,8 @@ public abstract class BaseStockClient : IStockExchangeClient
     protected TimeSpan IdleTimeout { get; }
     public string InstanceName { get; }
 
+    protected ILogger Logger => _logger;
+
     protected BaseStockClient(BaseStockExchangeClientConfiguration configuration, ILogger logger, IClientMetrics metrics)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -108,7 +110,7 @@ public abstract class BaseStockClient : IStockExchangeClient
     }
 
     protected virtual Task StartInternalAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
-    protected abstract ValueTask SubscribeAsync(ClientWebSocket ws, CancellationToken ct);
+    protected abstract Task SubscribeAsync(ClientWebSocket ws, CancellationToken ct);
     protected abstract bool TryParse(ReadOnlySpan<byte> rawMessage, out IStockQuote stockQuote);
     protected virtual void ConfigureWebSocket(ClientWebSocketOptions options) { }
 

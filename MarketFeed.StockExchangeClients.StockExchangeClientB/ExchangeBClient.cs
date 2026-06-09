@@ -27,11 +27,11 @@ public sealed class ExchangeBClient : BaseStockClient
         options.SetRequestHeader("Authorization", $"Bearer {_authToken}");
     }
 
-    protected override async ValueTask SubscribeAsync(ClientWebSocket ws, CancellationToken ct)
+    protected override Task SubscribeAsync(ClientWebSocket ws, CancellationToken ct)
     {
         var subscribe = new XElement("subscribe", _tickers.Select(t => new XElement("symbol", t)));
         var payload = Encoding.UTF8.GetBytes(subscribe.ToString(SaveOptions.DisableFormatting));
-        await ws.SendAsync(payload, WebSocketMessageType.Text, endOfMessage: true, ct);
+        return ws.SendAsync(payload, WebSocketMessageType.Text, endOfMessage: true, ct);
     }
 
     protected override bool TryParse(ReadOnlySpan<byte> rawMessage, out IStockQuote stockQuote)
@@ -51,8 +51,9 @@ public sealed class ExchangeBClient : BaseStockClient
             stockQuote = quote;
             return true;
         }
-        catch (InvalidOperationException)
+        catch (Exception ex)
         {
+            Logger.LogDebug(ex, "{Exchange}: failed to parse message. Exception: ", InstanceName);
             return false;
         }
     }
